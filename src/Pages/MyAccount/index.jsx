@@ -1,14 +1,14 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import AccountSidebar from "../../components/AccountSidebar";
-import { MyContext } from "../../App";
 import { useNavigate } from "react-router-dom";
 import { editData, postData } from "../../utils/api";
 import CircularProgress from '@mui/material/CircularProgress';
 import { Collapse } from "react-collapse";
 import { PhoneInput } from 'react-international-phone';
 import 'react-international-phone/style.css';
+import { useSelector } from "react-redux";
 
 const MyAccount = () => {
 
@@ -31,7 +31,7 @@ const MyAccount = () => {
     confirmPassword: ''
   });
 
-  const context = useContext(MyContext);
+  const { userData, isLogin } = useSelector((state) => state.auth);
   const history = useNavigate();
 
   useEffect(() => {
@@ -42,28 +42,28 @@ const MyAccount = () => {
     }
 
 
-  }, [context?.isLogin])
+  }, [isLogin])
 
 
   useEffect(() => {
-    if (context?.userData?._id !== "" && context?.userData?._id !== undefined) {
-      setUserId(context?.userData?._id);
+    if (userData?._id !== "" && userData?._id !== undefined) {
+      setUserId(userData?._id);
       setTimeout(() => {
         setFormsFields({
-          name: context?.userData?.name,
-          email: context?.userData?.email,
-          mobile: context?.userData?.mobile
+          name: userData?.name,
+          email: userData?.email,
+          mobile: userData?.mobile
         })
       }, 200);
-      const ph = `"${context?.userData?.mobile}"`
+      const ph = `"${userData?.mobile}"`
       setPhone(ph)
 
       setChangePassword({
-        email: context?.userData?.email
+        email: userData?.email
       })
     }
 
-  }, [context?.userData])
+  }, [userData])
 
 
 
@@ -95,19 +95,19 @@ const MyAccount = () => {
     setIsLoading(true);
 
     if (formFields.name === "") {
-      context.alertBox("error", "Please enter full name");
+      alertBox("error", "Please enter full name");
       return false
     }
 
 
     if (formFields.email === "") {
-      context.alertBox("error", "Please enter email id");
+      alertBox("error", "Please enter email id");
       return false
     }
 
 
     if (formFields.mobile === "") {
-      context.alertBox("error", "Please enter mobile number");
+      alertBox("error", "Please enter mobile number");
       return false
     }
 
@@ -116,10 +116,10 @@ const MyAccount = () => {
       console.log(res)
       if (res?.error !== true) {
         setIsLoading(false);
-        context.alertBox("success", res?.data?.message);
+        alertBox("success", res?.data?.message);
 
       } else {
-        context.alertBox("error", res?.data?.message);
+        alertBox("error", res?.data?.message);
         setIsLoading(false);
       }
 
@@ -138,24 +138,24 @@ const MyAccount = () => {
     setIsLoading2(true);
 
     if (changePassword.oldPassword === "") {
-      context.alertBox("error", "Please enter old password");
+      alertBox("error", "Please enter old password");
       return false
     }
 
 
     if (changePassword.newPassword === "") {
-      context.alertBox("error", "Please enter new password");
+      alertBox("error", "Please enter new password");
       return false
     }
 
 
     if (changePassword.confirmPassword === "") {
-      context.alertBox("error", "Please enter confirm password");
+      alertBox("error", "Please enter confirm password");
       return false
     }
 
     if (changePassword.confirmPassword !== changePassword.newPassword) {
-      context.alertBox("error", "password and confirm password not match");
+      alertBox("error", "password and confirm password not match");
       return false
     }
 
@@ -164,9 +164,9 @@ const MyAccount = () => {
 
       if (res?.error !== true) {
         setIsLoading2(false);
-        context.alertBox("success", res?.message);
+        alertBox("success", res?.message);
       } else {
-        context.alertBox("error", res?.message);
+        alertBox("error", res?.message);
         setIsLoading2(false);
       }
 
@@ -271,7 +271,7 @@ const MyAccount = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
 
                   {
-                    context?.userData?.signUpWithGoogle === false &&
+                    userData?.signUpWithGoogle === false &&
                     <div className="col">
                       <TextField
                         label="Old Password"

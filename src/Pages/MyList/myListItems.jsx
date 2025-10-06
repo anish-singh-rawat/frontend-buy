@@ -1,18 +1,20 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Rating from "@mui/material/Rating";
 import { IoCloseSharp } from "react-icons/io5";
-import { MyContext } from "../../App";
 import { deleteData } from "../../utils/api";
+import { useDispatch } from "react-redux";
+import { getMyListData } from "../../store/thunks";
+import { alertBox } from "../../utils/alertBox";
 
 const MyListItems = (props) => {
 
-  const context = useContext(MyContext);
+  const dispatch = useDispatch();
 
   const removeItem=(id)=>{
     deleteData(`/api/myList/${id}`).then((res)=>{
-      context?.alertBox("success", "Product remove from My List");
-      context?.getMyListData();
+      alertBox("success", "Product remove from My List");
+      dispatch(getMyListData());
      
     })
   }

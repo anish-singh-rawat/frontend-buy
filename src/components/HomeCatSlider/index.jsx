@@ -1,16 +1,16 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import 'swiper/css/free-mode';
+import { useSelector } from "react-redux";
 
 import { Navigation,FreeMode } from "swiper/modules";
 import { Link } from "react-router-dom";
-import { MyContext } from "../../App";
 
 const HomeCatSlider = (props) => {
 
-  const context = useContext(MyContext);
+  const { windowWidth } = useSelector((state) => state.ui);
 
   return (
     <div className="homeCatSlider pt-0 lg:pt-4 py-4 lg:py-8">
@@ -18,7 +18,7 @@ const HomeCatSlider = (props) => {
         <Swiper
           slidesPerView={8}
           spaceBetween={10}
-          navigation={context?.windowWidth < 992 ? false : true}
+          navigation={windowWidth < 992 ? false : true}
           modules={[Navigation, FreeMode]}
           freeMode={true}
           breakpoints={{

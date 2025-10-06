@@ -1,14 +1,16 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { IoMdEye } from "react-icons/io";
 import { IoMdEyeOff } from "react-icons/io";
 import { Link } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
-import { MyContext } from "../../App";
 import { postData } from "../../utils/api";
 import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate } from "react-router-dom";
+import { alertBox } from "../../utils/alertBox";
+import { useDispatch } from "react-redux";
+import { setIsLogin } from "../../store/slices/authSlice";
 
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { firebaseApp } from "../../firebase";
@@ -25,8 +27,8 @@ const Register = () => {
     password: ""
   })
 
-  const context = useContext(MyContext);
   const history = useNavigate();
+  const dispatch = useDispatch();
 
     useEffect(()=>{
       window.scrollTo(0,0)
@@ -51,18 +53,18 @@ const Register = () => {
     setIsLoading(true);
 
     if (formFields.name === "") {
-      context.alertBox("error", "Please enter full name");
+      alertBox("error", "Please enter full name");
       return false
     }
 
     if (formFields.email === "") {
-      context.alertBox("error", "Please enter email id");
+      alertBox("error", "Please enter email id");
       return false
     }
 
 
     if (formFields.password === "") {
-      context.alertBox("error", "Please enter password");
+      alertBox("error", "Please enter password");
       return false
     }
 
@@ -71,7 +73,7 @@ const Register = () => {
 
       if (res?.error !== true) {
         setIsLoading(false);
-        context.alertBox("success", res?.message);
+        alertBox("success", res?.message);
         localStorage.setItem("userEmail", formFields.email)
         setFormFields({
           name: "",
@@ -81,7 +83,7 @@ const Register = () => {
 
         history("/verify")
       } else {
-        context.alertBox("error", res?.message);
+        alertBox("error", res?.message);
         setIsLoading(false);
       }
 
@@ -116,16 +118,16 @@ const Register = () => {
 
           if (res?.error !== true) {
             setIsLoading(false);
-            context.alertBox("success", res?.message);
+            alertBox("success", res?.message);
             localStorage.setItem("userEmail", fields.email)
             localStorage.setItem("accessToken", res?.data?.accesstoken);
             localStorage.setItem("refreshToken", res?.data?.refreshToken);
 
-            context.setIsLogin(true);
+            dispatch(setIsLogin(true));
 
             history("/")
           } else {
-            context.alertBox("error", res?.message);
+            alertBox("error", res?.message);
             setIsLoading(false);
           }
 

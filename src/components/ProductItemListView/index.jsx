@@ -1,4 +1,4 @@
-import React,{useContext,useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../ProductItem/style.css";
 import { Link } from "react-router-dom";
 import Rating from "@mui/material/Rating";
@@ -6,7 +6,6 @@ import Button from "@mui/material/Button";
 import { FaRegHeart } from "react-icons/fa";
 import { IoGitCompareOutline } from "react-icons/io5";
 import { MdZoomOutMap } from "react-icons/md";
-import { MyContext } from "../../App";
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { FaMinus } from "react-icons/fa6";
 import { FaPlus } from "react-icons/fa6";
@@ -14,6 +13,9 @@ import { deleteData, editData, postData } from "../../utils/api";
 import CircularProgress from '@mui/material/CircularProgress';
 import { MdClose } from "react-icons/md";
 import { IoMdHeart } from "react-icons/io";
+import { useSelector, useDispatch } from "react-redux";
+import { addToCart as addToCartThunk, getCartItems, getMyListData, alertBox } from "../../store/thunks";
+import { handleOpenProductDetailsModal } from "../../store/slices/uiSlice";
 
 const ProductItem = (props) => {
 
@@ -28,7 +30,10 @@ const ProductItem = (props) => {
     const [isLoading, setIsLoading] = useState(false);
   
   
-    const context = useContext(MyContext);
+    const dispatch = useDispatch();
+    const { userData } = useSelector((state) => state.auth);
+    const { cartData } = useSelector((state) => state.cart);
+    const { myListData } = useSelector((state) => state.wishlist);
   
     const addToCart = (product, userId, quantity) => {
   
@@ -53,33 +58,31 @@ const ProductItem = (props) => {
   
   
       setIsLoading(true);
-  
+
       if (props?.item?.size?.length !== 0 || props?.item?.productRam?.length !== 0 || props?.item?.productWeight
         ?.length !== 0) {
         setIsShowTabs(true)
       } else {
         setIsAdded(true);
-  
+
         setIsShowTabs(false);
         setTimeout(() => {
           setIsLoading(false);
         }, 500);
-        context?.addToCart(productItem, userId, quantity);
-  
+        dispatch(addToCartThunk({ product: productItem, userId, quantity }));
+
       }
-  
-  
-  
+
+
+
       if (activeTab !== null) {
-        context?.addToCart(productItem, userId, quantity);
+        dispatch(addToCartThunk({ product: productItem, userId, quantity }));
         setIsAdded(true);
         setIsShowTabs(false)
         setTimeout(() => {
           setIsLoading(false);
         }, 500);
-      }
-  
-  
+      }  
     }
   
   
@@ -89,14 +92,14 @@ const ProductItem = (props) => {
     }
   
     useEffect(() => {
-      const item = context?.cartData?.filter((cartItem) =>
+      const item = cartData?.filter((cartItem) =>
         cartItem.productId.includes(props?.item?._id)
       )
   
-      const myListItem = context?.myListData?.filter((item) =>
+      const myListItem = myListData?.filter((item) =>
         item.productId.includes(props?.item?._id)
       )
-  
+
       if (item?.length !== 0) {
         setCartItem(item)
         setIsAdded(true);
@@ -104,17 +107,15 @@ const ProductItem = (props) => {
       } else {
         setQuantity(1)
       }
-  
-  
+
+
       if (myListItem?.length !== 0) {
         setIsAddedInMyList(true);
       } else {
         setIsAddedInMyList(false)
       }
-  
-    }, [context?.cartData]);
-  
-  
+
+    }, [cartData]);  
     const minusQty = () => {
       if (quantity !== 1 && quantity > 1) {
         setQuantity(quantity - 1)
@@ -126,8 +127,8 @@ const ProductItem = (props) => {
       if (quantity === 1) {
         deleteData(`/api/cart/delete-cart-item/${cartItem[0]?._id}`).then((res) => {
           setIsAdded(false);
-          context.alertBox("success", "Item Removed ");
-          context?.getCartItems();
+          alertBox("success", "Item Removed ");
+          dispatch(getCartItems());
           setIsShowTabs(false);
           setActiveTab(null);
         })
@@ -137,14 +138,12 @@ const ProductItem = (props) => {
           qty: quantity - 1,
           subTotal: props?.item?.price * (quantity - 1)
         }
-  
+
         editData(`/api/cart/update-qty`, obj).then((res) => {
-          context.alertBox("success", res?.data?.message);
-          context?.getCartItems();
+          alertBox("success", res?.data?.message);
+          dispatch(getCartItems());
         })
-      }
-  
-    }
+      }    }
   
   
     const addQty = () => {
@@ -158,8 +157,8 @@ const ProductItem = (props) => {
       }
   
       editData(`/api/cart/update-qty`, obj).then((res) => {
-        context.alertBox("success", res?.data?.message);
-        context?.getCartItems();
+        alertBox("success", res?.data?.message);
+        dispatch(getCartItems());
       })
   
   
@@ -168,15 +167,15 @@ const ProductItem = (props) => {
   
   
     const handleAddToMyList = (item) => {
-      if (context?.userData === null) {
-        context?.alertBox("error", "you are not login please login first");
+      if (userData === null) {
+        alertBox("error", "you are not login please login first");
         return false
       }
-  
+
       else {
         const obj = {
           productId: item?._id,
-          userId: context?.userData?._id,
+          userId: userData?._id,
           productTitle: item?.name,
           image: item?.images[0],
           rating: item?.rating,
@@ -185,18 +184,18 @@ const ProductItem = (props) => {
           brand: item?.brand,
           discount: item?.discount
         }
-  
-  
+
+
         postData("/api/myList/add", obj).then((res) => {
           if (res?.error === false) {
-            context?.alertBox("success", res?.message);
+            alertBox("success", res?.message);
             setIsAddedInMyList(true);
-            context?.getMyListData();
+            dispatch(getMyListData());
           } else {
-            context?.alertBox("error", res?.message);
+            alertBox("error", res?.message);
           }
         })
-  
+
       }
     }
 
@@ -277,7 +276,7 @@ const ProductItem = (props) => {
 
         <div className="actions absolute top-[-20px] right-[5px] z-50 flex items-center gap-2 flex-col w-[50px] transition-all duration-300 group-hover:top-[15px] opacity-0 group-hover:opacity-100">
 
-          <Button className="!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white  text-black hover:!bg-primary hover:text-white group" onClick={() => context.handleOpenProductDetailsModal(true, props?.item)}>
+          <Button className="!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white  text-black hover:!bg-primary hover:text-white group" onClick={() => dispatch(handleOpenProductDetailsModal({ status: true, item: props?.item }))}>
             <MdZoomOutMap className="text-[18px] !text-black group-hover:text-white hover:!text-white" />
           </Button>
 
@@ -330,7 +329,7 @@ const ProductItem = (props) => {
             isAdded === false ?
 
               <Button className="btn-org btn-border flex w-full btn-sm gap-2 " size="small"
-                onClick={() => addToCart(props?.item, context?.userData?._id, quantity)}>
+                onClick={() => addToCart(props?.item, userData?._id, quantity)}>
                 <MdOutlineShoppingCart className="text-[18px]" /> Add to Cart
               </Button>
 

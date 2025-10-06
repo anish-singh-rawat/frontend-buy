@@ -1,11 +1,11 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import InnerImageZoom from "react-inner-image-zoom";
 import "react-inner-image-zoom/lib/InnerImageZoom/styles.css";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
-import { MyContext } from "../../App";
+import { useSelector } from "react-redux";
 
 export const ProductZoom = (props) => {
 
@@ -13,7 +13,7 @@ export const ProductZoom = (props) => {
   const zoomSliderBig = useRef();
   const zoomSliderSml = useRef();
 
-  const context = useContext(MyContext);
+  const { windowWidth } = useSelector((state) => state.ui);
 
   const goto = (index) => {
     setSlideIndex(index);
@@ -27,10 +27,10 @@ export const ProductZoom = (props) => {
         <div className="slider w-full lg:w-[15%] order-2 lg:order-1">
           <Swiper
             ref={zoomSliderSml}
-            direction={context?.windowWidth < 992 ? "horizontal" : "vertical"}
+            direction={windowWidth < 992 ? "horizontal" : "vertical"}
             slidesPerView={5}
             spaceBetween={10}
-            navigation={context?.windowWidth < 992 ? false : true}
+            navigation={windowWidth < 992 ? false : true}
             modules={[Navigation]}
             className={`zoomProductSliderThumbs h-auto lg:h-[500px] overflow-hidden ${props?.images?.length > 5 && 'space'}`}
           >

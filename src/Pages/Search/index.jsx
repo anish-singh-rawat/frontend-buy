@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Sidebar } from "../../components/Sidebar";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import ProductItem from "../../components/ProductItem";
@@ -11,7 +11,8 @@ import MenuItem from "@mui/material/MenuItem";
 import Pagination from "@mui/material/Pagination";
 import ProductLoadingGrid from "../../components/ProductLoading/productLoadingGrid";
 import { postData } from "../../utils/api";
-import { MyContext } from "../../App";
+import { useSelector, useDispatch } from "react-redux";
+import { setOpenFilter } from "../../store/slices/uiSlice";
 
 const SearchPage = () => {
   const [itemView, setItemView] = useState("grid");
@@ -25,7 +26,8 @@ const SearchPage = () => {
 
   const [selectedSortVal, setSelectedSortVal] = useState("Name, A to Z");
 
-  const context = useContext(MyContext);
+  const dispatch = useDispatch();
+  const { openFilter, windowWidth } = useSelector((state) => state.ui);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -59,7 +61,7 @@ const SearchPage = () => {
 
       <div className="bg-white p-2">
         <div className="container flex gap-3">
-          <div className={`sidebarWrapper fixed -bottom-[100%] left-0 w-fulllg:h-full lg:static lg:w-[20%] bg-white z-[102] lg:z-[100] p-3 lg:p-0  transition-all lg:opacity-100 opacity-0 ${context?.openFilter === true ? 'open' : ''}`}>
+          <div className={`sidebarWrapper fixed -bottom-[100%] left-0 w-fulllg:h-full lg:static lg:w-[20%] bg-white z-[102] lg:z-[100] p-3 lg:p-0  transition-all lg:opacity-100 opacity-0 ${openFilter === true ? 'open' : ''}`}>
             <Sidebar
               productsData={productsData}
               setProductsData={setProductsData}
@@ -71,9 +73,9 @@ const SearchPage = () => {
           </div>
 
           {
-            context?.windowWidth < 992 &&
-            <div className={`filter_overlay w-full h-full bg-[rgba(0,0,0,0.5)] fixed top-0 left-0 z-[101]  ${context?.openFilter === true ? 'block' : 'hidden'}`}
-              onClick={()=>context?.setOpenFilter(false)}
+            windowWidth < 992 &&
+            <div className={`filter_overlay w-full h-full bg-[rgba(0,0,0,0.5)] fixed top-0 left-0 z-[101]  ${openFilter === true ? 'block' : 'hidden'}`}
+              onClick={()=>dispatch(setOpenFilter(false))}
             ></div>
           }
 

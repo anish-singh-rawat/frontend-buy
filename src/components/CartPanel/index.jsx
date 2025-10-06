@@ -1,18 +1,22 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import Button from "@mui/material/Button";
-import { MyContext } from "../../App";
+import { useSelector, useDispatch } from "react-redux";
 import { deleteData } from "../../utils/api";
+import { getCartItems } from "../../store/thunks";
+import { toggleCartPanel } from "../../store/slices/uiSlice";
+import { alertBox } from "../../utils/alertBox";
 
 const CartPanel = (props) => {
 
-  const context = useContext(MyContext);
+  const dispatch = useDispatch();
+  const { cartData } = useSelector((state) => state.cart);
 
   const removeItem = (id) => {
     deleteData(`/api/cart/delete-cart-item/${id}`).then((res) => {
-      context.alertBox("success", "Item Removed ");
-      context?.getCartItems();
+      alertBox("success", "Item Removed ");
+      dispatch(getCartItems());
     })
   }
 
@@ -26,7 +30,7 @@ const CartPanel = (props) => {
           props?.data?.map((item, index) => {
             return (
               <div className="cartItem w-full flex items-center gap-4 border-b border-[rgba(0,0,0,0.1)] pb-4">
-                <div className="img w-[25%] overflow-hidden h-[80px] rounded-md"  onClick={context.toggleCartPanel(false)}>
+                <div className="img w-[25%] overflow-hidden h-[80px] rounded-md"  onClick={() => dispatch(toggleCartPanel(false))}>
                   <Link to={`/product/${item?.productId}`} className="block group">
                     <img
                       src={item?.image}
@@ -36,7 +40,7 @@ const CartPanel = (props) => {
                 </div>
 
                 <div className="info w-[75%] pr-5 relative pt-3">
-                  <h4 className="text-[12px] sm:text-[14px] font-[500]"  onClick={context.toggleCartPanel(false)}>
+                  <h4 className="text-[12px] sm:text-[14px] font-[500]"  onClick={() => dispatch(toggleCartPanel(false))}>
                     <Link to={`/product/${item?.productId}`} className="link transition-all">
                       {item?.productTitle?.substr(0, 20) + '...'}
                     </Link>
@@ -66,11 +70,11 @@ const CartPanel = (props) => {
       <div className="bottomSec absolute bottom-[10px] left-[10px] w-full overflow-hidden pr-5">
         <div className="bottomInfo py-3 px-4 w-full border-t border-[rgba(0,0,0,0.1)] flex items-center justify-between flex-col">
           <div className="flex items-center justify-between w-full">
-            <span className="text-[14px] font-[600]">{context?.cartData?.length} item</span>
+            <span className="text-[14px] font-[600]">{cartData?.length} item</span>
             <span className="text-primary font-bold">
               {
-                (context.cartData?.length !== 0 ?
-                  context.cartData?.map(item => parseInt(item.price) * item.quantity)
+                (cartData?.length !== 0 ?
+                  cartData?.map(item => parseInt(item.price) * item.quantity)
                     .reduce((total, value) => total + value, 0) : 0)
                   ?.toLocaleString('en-US', { style: 'currency', currency: 'INR' })
               }
@@ -85,8 +89,8 @@ const CartPanel = (props) => {
             <span className="text-[14px] font-[600]">Total (tax excl.)</span>
             <span className="text-primary font-bold">
               {
-                (context.cartData?.length !== 0 ?
-                  context.cartData?.map(item => parseInt(item.price) * item.quantity)
+                (cartData?.length !== 0 ?
+                  cartData?.map(item => parseInt(item.price) * item.quantity)
                     .reduce((total, value) => total + value, 0) : 0)
                   ?.toLocaleString('en-US', { style: 'currency', currency: 'INR' })
               }
@@ -96,10 +100,10 @@ const CartPanel = (props) => {
           <br />
 
           <div className="flex items-center justify-between w-full gap-5">
-            <Link to="/cart" className=" w-[50%] d-block" onClick={context.toggleCartPanel(false)}>
+            <Link to="/cart" className=" w-[50%] d-block" onClick={() => dispatch(toggleCartPanel(false))}>
               <Button className="btn-org btn-lg w-full">View Cart</Button>
             </Link>
-            <Link to="/checkout" className=" w-[50%] d-block"  onClick={context.toggleCartPanel(false)}>
+            <Link to="/checkout" className=" w-[50%] d-block"  onClick={() => dispatch(toggleCartPanel(false))}>
               <Button className="btn-org btn-border btn-lg w-full">Checkout</Button>
             </Link>
           </div>

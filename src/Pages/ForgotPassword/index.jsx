@@ -1,10 +1,9 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { IoMdEye } from "react-icons/io";
 import { IoMdEyeOff } from "react-icons/io";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { MyContext } from "../../App";
 import CircularProgress from '@mui/material/CircularProgress';
 import { postData } from "../../utils/api";
 
@@ -19,7 +18,7 @@ const ForgotPassword = () => {
     confirmPassword: ''
   });
 
-  const context = useContext(MyContext);
+
   const history = useNavigate();
 
 
@@ -43,20 +42,20 @@ const ForgotPassword = () => {
     setIsLoading(true);
 
     if (formFields.newPassword === "") {
-      context.alertBox("error", "Please enter new password");
+      alertBox("error", "Please enter new password");
       setIsLoading(false);
       return false
     }
 
 
     if (formFields.confirmPassword === "") {
-      context.alertBox("error", "Please enter confirm password");
+      alertBox("error", "Please enter confirm password");
       setIsLoading(false);
       return false
     }
 
     if (formFields.confirmPassword !== formFields.newPassword) {
-      context.alertBox("error", "Password and confirm password not match");
+      alertBox("error", "Password and confirm password not match");
       setIsLoading(false);
       return false
     }
@@ -67,12 +66,12 @@ const ForgotPassword = () => {
       if (res?.error === false) {
         localStorage.removeItem("userEmail")
         localStorage.removeItem("actionType")
-        context.alertBox("success", res?.message);
+        alertBox("success", res?.message);
         setIsLoading(false);
         history("/login")
       }
       else {
-        context.alertBox("error", res?.message);
+        alertBox("error", res?.message);
       }
     })
 

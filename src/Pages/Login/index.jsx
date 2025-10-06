@@ -1,13 +1,15 @@
-import React,{useContext, useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { IoMdEye } from "react-icons/io";
 import { IoMdEyeOff } from "react-icons/io";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
-import { MyContext } from "../../App";
 import CircularProgress from '@mui/material/CircularProgress';
 import { postData } from "../../utils/api";
+import { useDispatch } from "react-redux";
+import { setIsLogin, setUserData } from "../../store/slices/authSlice";
+import { alertBox } from "../../store/thunks";
 
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { firebaseApp } from "../../firebase";
@@ -22,7 +24,7 @@ const Login = () => {
     password:''
   });
 
-  const context  = useContext(MyContext);
+  const dispatch = useDispatch();
   const history = useNavigate();
 
  
@@ -39,11 +41,11 @@ const Login = () => {
   const forgotPassword =()=>{
   
           if(formFields.email===""){
-            context.alertBox("error", "Please enter email id");
+            alertBox("error", "Please enter email id");
             return false;
           }
           else{
-            context.alertBox("success", `OTP send to ${formFields.email}`);
+            alertBox("success", `OTP send to ${formFields.email}`);
             localStorage.setItem("userEmail", formFields.email);
             localStorage.setItem("actionType", 'forgot-password');
 
@@ -51,10 +53,10 @@ const Login = () => {
               email: formFields.email,
             }).then((res) => {
               if (res?.error === false) {
-                context.alertBox("success", res?.message);
+                alertBox("success", res?.message);
                 history("/verify")
               } else {
-                context.alertBox("error", res?.message);
+                alertBox("error", res?.message);
               }
             })
 
@@ -82,13 +84,13 @@ const Login = () => {
       setIsLoading(true);
   
       if (formFields.email === "") {
-        context.alertBox("error", "Please enter email id");
+        alertBox("error", "Please enter email id");
         return false
       }
   
   
       if (formFields.password === "") {
-        context.alertBox("error", "Please enter password");
+        alertBox("error", "Please enter password");
         return false
       }
   
@@ -98,7 +100,7 @@ const Login = () => {
   
         if (res?.error !== true) {
           setIsLoading(false);
-          context.alertBox("success", res?.message);
+          alertBox("success", res?.message);
           setFormsFields({
             email: "",
             password: ""
@@ -107,11 +109,11 @@ const Login = () => {
           localStorage.setItem("accessToken",res?.data?.accesstoken);
           localStorage.setItem("refreshToken",res?.data?.refreshToken);
 
-          context.setIsLogin(true);
+          dispatch(setIsLogin(true));
   
           history("/")
         } else {
-          context.alertBox("error", res?.message);
+          alertBox("error", res?.message);
           setIsLoading(false);
         }
   
@@ -146,16 +148,16 @@ const Login = () => {
     
               if (res?.error !== true) {
                 setIsLoading(false);
-                context.alertBox("success", res?.message);
+                alertBox("success", res?.message);
                 localStorage.setItem("userEmail", fields.email)
                 localStorage.setItem("accessToken", res?.data?.accesstoken);
                 localStorage.setItem("refreshToken", res?.data?.refreshToken);
     
-                context.setIsLogin(true);
+                dispatch(setIsLogin(true));
     
                 history("/")
               } else {
-                context.alertBox("error", res?.message);
+                alertBox("error", res?.message);
                 setIsLoading(false);
               }
     

@@ -1,16 +1,22 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import { IoCloseSharp } from "react-icons/io5";
 import { CategoryCollapse } from "../../CategoryCollapse";
 import { Button } from "@mui/material";
-import { MyContext } from "../../../App";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { fetchDataFromApi } from "../../../utils/api";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../../../store/slices/authSlice";
+import { alertBox } from "../../../utils/alertBox";
 
 const CategoryPanel = (props) => {
 
-  const context = useContext(MyContext);
+  const { catData } = useSelector((state) => state.category);
+  const { isLogin } = useSelector((state) => state.auth);
+  const { windowWidth } = useSelector((state) => state.ui);
+  const dispatch = useDispatch();
+  const history = useNavigate();
 
   const toggleDrawer = (newOpen) => () => {
     props.setIsOpenCatPanel(newOpen);
@@ -38,7 +44,7 @@ const CategoryPanel = (props) => {
       }
 
       {
-        context?.windowWidth < 992 && context?.isLogin === false &&
+        windowWidth < 992 && isLogin === false &&
         <Link to="/login" className="p-3 block" onClick={() => {
           props.setIsOpenCatPanel(false);
           props.propsSetIsOpenCatPanel(false)
@@ -49,22 +55,18 @@ const CategoryPanel = (props) => {
 
 
       {
-        context?.windowWidth < 992 && context?.isLogin === true &&
+        windowWidth < 992 && isLogin === true &&
         <div className="p-3 block" onClick={() => {
           props.setIsOpenCatPanel(false);
           props.propsSetIsOpenCatPanel(false)
           fetchDataFromApi(`/api/user/logout?token=${localStorage.getItem('accessToken')}`, { withCredentials: true }).then((res) => {
             if (res?.error === false) {
-              context.setIsLogin(false);
+              dispatch(logout());
               localStorage.removeItem("accessToken");
               localStorage.removeItem("refreshToken");
-              context.setUserData(null);
-              context?.setCartData([]);
-              context?.setMyListData([]);
               history("/");
+              alertBox("success", "Logged out successfully");
             }
-
-
           })
         }}>
           <Button className="btn-org w-full">Logout</Button>

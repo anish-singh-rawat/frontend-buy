@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
@@ -6,7 +6,8 @@ import { GoTriangleDown } from "react-icons/go";
 import Rating from "@mui/material/Rating";
 import { IoCloseSharp } from "react-icons/io5";
 import { deleteData, editData, fetchDataFromApi } from "../../utils/api";
-import { MyContext } from "../../App";
+import { useDispatch, useSelector } from "react-redux";
+import { getCartItems, alertBox } from "../../store/thunks";
 
 const CartItems = (props) => {
   const [sizeanchorEl, setSizeAnchorEl] = useState(null);
@@ -19,7 +20,8 @@ const CartItems = (props) => {
 
   const numbers = Array.from({ length: 20 }, () => Math.floor(Math.random() * 10) + 1);
 
-  const context = useContext(MyContext);
+  const dispatch = useDispatch();
+  const { windowWidth } = useSelector(state => state.ui);
 
   const handleClickSize = (event) => {
     setSizeAnchorEl(event.currentTarget);
@@ -47,8 +49,8 @@ const CartItems = (props) => {
 
       editData("/api/cart/update-qty", cartObj).then((res) => {
         if (res?.data?.error === false) {
-          context.alertBox("success", res?.data?.message);
-          context?.getCartItems();
+          alertBox("success", res?.data?.message);
+          dispatch(getCartItems());
         }
       })
 
@@ -85,12 +87,12 @@ const CartItems = (props) => {
         if (item?.length !== 0) {
           editData("/api/cart/update-qty", cartObj).then((res) => {
             if (res?.data?.error === false) {
-              context.alertBox("success", res?.data?.message);
-              context?.getCartItems();
+              alertBox("success", res?.data?.message);
+              dispatch(getCartItems());
             }
           })
         } else {
-          context.alertBox("error", `Product not available with the size of ${selectedVal}`);
+          alertBox("error", `Product not available with the size of ${selectedVal}`);
         }
 
 
@@ -113,12 +115,12 @@ const CartItems = (props) => {
         if (item?.length !== 0) {
           editData("/api/cart/update-qty", cartObj).then((res) => {
             if (res?.data?.error === false) {
-              context.alertBox("success", res?.data?.message);
-              context?.getCartItems();
+              alertBox("success", res?.data?.message);
+              dispatch(getCartItems());
             }
           })
         } else {
-          context.alertBox("error", `Product not available with the weight of ${selectedVal}`);
+          alertBox("error", `Product not available with the weight of ${selectedVal}`);
         }
 
 
@@ -143,12 +145,12 @@ const CartItems = (props) => {
         if (item?.length !== 0) {
           editData("/api/cart/update-qty", cartObj).then((res) => {
             if (res?.data?.error === false) {
-              context.alertBox("success", res?.data?.message);
-              context?.getCartItems();
+              alertBox("success", res?.data?.message);
+              dispatch(getCartItems());
             }
           })
         } else {
-          context.alertBox("error", `Product not available with the ram of ${selectedVal}`);
+          alertBox("error", `Product not available with the ram of ${selectedVal}`);
         }
 
 
@@ -165,8 +167,8 @@ const CartItems = (props) => {
 
   const removeItem = (id) => {
     deleteData(`/api/cart/delete-cart-item/${id}`).then((res) => {
-      context.alertBox("success", "Product removed from cart");
-      context?.getCartItems();
+      alertBox("success", "Product removed from cart");
+      dispatch(getCartItems());
     })
   }
 
@@ -186,7 +188,7 @@ const CartItems = (props) => {
         <IoCloseSharp className="cursor-pointer absolute top-[0px] right-[0px] text-[22px] link transition-all" onClick={() => removeItem(props?.item?._id)} />
         <span className="text-[13px]">{props?.item?.brand}</span>
         <h3 className="text-[13px] sm:text-[15px] w-[80%]">
-          <Link to={`/product/${props?.item?.productId}`} className="link">{props?.item?.productTitle?.substr(0, context?.windowWidth < 992 ? 30 : 120) + '...'}</Link>
+          <Link to={`/product/${props?.item?.productId}`} className="link">{props?.item?.productTitle?.substr(0, windowWidth < 992 ? 30 : 120) + '...'}</Link>
         </h3>
 
         <Rating name="size-small" value={props?.item?.rating} size="small" readOnly />

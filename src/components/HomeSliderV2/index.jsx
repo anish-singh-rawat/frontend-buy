@@ -1,20 +1,20 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/effect-fade";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import { useSelector } from "react-redux";
 
 // import required modules
 import { EffectFade, Navigation, Pagination, Autoplay } from "swiper/modules";
 import Button from "@mui/material/Button";
 import { Link } from "react-router-dom";
-import { MyContext } from "../../App";
 
 const HomeBannerV2 = (props) => {
 
-  const context = useContext(MyContext);
+  const { windowWidth } = useSelector((state) => state.ui);
 
   return (
     <Swiper
@@ -22,7 +22,7 @@ const HomeBannerV2 = (props) => {
       slidesPerView={1}
       spaceBetween={30}
       effect="fade"
-      navigation={context?.windowWidth < 992 ? false : true}
+            navigation={windowWidth < 992 ? false : true}
       pagination={{
         clickable: true,
       }}
@@ -49,13 +49,13 @@ const HomeBannerV2 = (props) => {
                       {item?.bannerTitleName}
                     </h4>
                     {
-                      context?.windowWidth < 992 &&
+                      windowWidth < 992 &&
                       <h2 className="text-[15px] lg:text-[30px] font-[700] w-full relative -right-[100%] opacity-0">
                         {item?.name?.length > 30 ? item?.name?.substr(0, 30) + '...' : item?.name}
                       </h2>
                     }
                     {
-                      context?.windowWidth > 992 &&
+                      windowWidth > 992 &&
                       <h2 className="text-[16px] sm:text-[20px] md:text-[25px] lg:text-[30px] font-[700] w-full relative -right-[100%] opacity-0">
                         {item?.name?.length > 70 ? item?.name?.substr(0, 70) + '...' : item?.name}
                       </h2>

@@ -1,10 +1,11 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Rating from "@mui/material/Rating";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import { MyContext } from '../../App';
 import { fetchDataFromApi, postData } from '../../utils/api';
 import CircularProgress from '@mui/material/CircularProgress';
+import { useSelector } from "react-redux";
+import { alertBox } from "../../utils/alertBox";
 export const Reviews = (props) => {
 
     const [reviews, setReviews] = useState({
@@ -20,19 +21,19 @@ export const Reviews = (props) => {
 
     const [reviewsData, setReviewsData] = useState([])
 
-    const context = useContext(MyContext);
+    const { userData } = useSelector((state) => state.auth);
 
     useEffect(() => {
         setReviews(() => ({
             ...reviews,
-            image: context?.userData?.avatar,
-            userName: context?.userData?.name,
-            userId: context?.userData?._id,
+            image: userData?.avatar,
+            userName: userData?.name,
+            userId: userData?._id,
             productId: props?.productId
         }))
 
         getReviews();
-    }, [context?.userData, props]);
+    }, [userData, props]);
 
 
     const onChangeInput = (e) => {
@@ -50,7 +51,7 @@ export const Reviews = (props) => {
             setLoading(true);
             postData("/api/user/addReview", reviews).then((res) => {
                 if (res?.error === false) {
-                    context.alertBox("success", res?.message);
+                    alertBox("success", res?.message);
                     setReviews(() => ({
                         ...reviews,
                         review: '',
@@ -61,12 +62,12 @@ export const Reviews = (props) => {
                     getReviews();
 
                 } else {
-                    context.alertBox("error", res?.message);
+                    alertBox("error", res?.message);
                 }
             })
         }
         else {
-            context.alertBox("error", "Please add review");
+            alertBox("error", "Please add review");
         }
 
 

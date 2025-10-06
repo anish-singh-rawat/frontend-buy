@@ -4,8 +4,7 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
-import { useContext } from 'react';
-import { MyContext } from '../../App';
+import { useSelector, useDispatch } from 'react-redux';
 import TextField from '@mui/material/TextField';
 
 import { PhoneInput } from 'react-international-phone';
@@ -14,6 +13,8 @@ import 'react-international-phone/style.css';
 import { Button } from '@mui/material';
 import { deleteData, editData, fetchDataFromApi, postData } from '../../utils/api';
 import CircularProgress from '@mui/material/CircularProgress';
+import { getUserDetails, alertBox } from '../../store/thunks';
+import { setOpenAddressPanel } from '../../store/slices/uiSlice';
 
 const AddAddress = () => {
 
@@ -34,20 +35,22 @@ const AddAddress = () => {
 
     const [isLoading, setIsLoading] = useState(false);
 
-    const context = useContext(MyContext);
+    const dispatch = useDispatch();
+    const { userData } = useSelector((state) => state.auth);
+    const { addressMode, addressId } = useSelector((state) => state.ui);
 
     useEffect(() => {
-        if (context?.userData?._id !== undefined) {
+        if (userData?._id !== undefined) {
 
 
             setFormsFields((prevState) => ({
                 ...prevState,
-                userId: context?.userData?._id
+                userId: userData?._id
             }))
 
         }
 
-    }, [context?.userData]);
+    }, [userData]);
 
 
     const onChangeInput = (e) => {
@@ -75,76 +78,76 @@ const AddAddress = () => {
 
     useEffect(()=>{
 
-        if(context?.addressMode === "edit"){
-            fetchAddress(context?.addressId)
+        if(addressMode === "edit"){
+            fetchAddress(addressId)
         }
         
-    },[context?.addressMode]);
+    },[addressMode]);
 
 
     const handleSubmit = (e) => {
         e.preventDefault();
         if (formFields.address_line1 === "") {
-            context.alertBox("error", "Please enter Address Line 1");
+            alertBox("error", "Please enter Address Line 1");
             return false
         }
 
 
         if (formFields.city === "") {
-            context.alertBox("error", "Please enter Your city name");
+            alertBox("error", "Please enter Your city name");
             return false
         }
 
 
         if (formFields.state === "") {
-            context.alertBox("error", "Please enter your state");
+            alertBox("error", "Please enter your state");
             return false
         }
 
 
         if (formFields.pincode === "") {
-            context.alertBox("error", "Please enter your pincode");
+            alertBox("error", "Please enter your pincode");
             return false
         }
 
 
         if (formFields.country === "") {
-            context.alertBox("error", "Please enter your country");
+            alertBox("error", "Please enter your country");
             return false
         }
 
 
         if (phone === "" || phone?.length < 5) {
-            context.alertBox("error", "Please enter your 10 digit mobile number a");
+            alertBox("error", "Please enter your 10 digit mobile number a");
             return false
         }
 
         if (formFields.landmark === "") {
-            context.alertBox("error", "Please enter landmark");
+            alertBox("error", "Please enter landmark");
             return false
         }
 
         if (formFields.addressType === "") {
-            context.alertBox("error", "Please select address type");
+            alertBox("error", "Please select address type");
             return false
         }
 
       
 
-        if (context?.addressMode === "add") {
+        if (addressMode === "add") {
             setIsLoading(true);
             postData(`/api/address/add`, formFields, { withCredentials: true }).then((res) => {
                 console.log(res)
                 if (res?.error !== true) {
 
-                    context.alertBox("success", res?.message);
+                    alertBox("success", res?.message);
                     setTimeout(() => {
-                        context.setOpenAddressPanel(false)
+                        dispatch(setOpenAddressPanel(false));
                         setIsLoading(false);
                     }, 500)
 
 
-                    context.getUserDetails();
+                    dispatch(getUserDetails());
 
                     setFormsFields({
                         address_line1: '',
@@ -164,7 +167,7 @@ const AddAddress = () => {
 
 
                 } else {
-                    context.alertBox("error", res?.message);
+                    alertBox("error", res?.message);
                     setIsLoading(false);
                 }
 
@@ -173,16 +176,16 @@ const AddAddress = () => {
 
 
 
-        if (context?.addressMode  === "edit") {
+        if (addressMode  === "edit") {
             setIsLoading(true);
-            editData(`/api/address/${context?.addressId}`, formFields, { withCredentials: true }).then((res) => {
+            editData(`/api/address/${addressId}`, formFields, { withCredentials: true }).then((res) => {
 
-                fetchDataFromApi(`/api/address/get?userId=${context?.userData?._id}`).then((res) => {
+                fetchDataFromApi(`/api/address/get?userId=${userData?._id}`).then((res) => {
                     setTimeout(() => {
                         setIsLoading(false);
-                        context.setOpenAddressPanel(false);
+                        dispatch(setOpenAddressPanel(false));
                     }, 500)
-                    context?.getUserDetails(res.data);
+                    dispatch(getUserDetails());
 
                     setFormsFields({
                         address_line1: '',

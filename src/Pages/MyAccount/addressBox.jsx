@@ -1,9 +1,10 @@
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { HiOutlineDotsVertical } from "react-icons/hi";
-import { MyContext } from '../../App';
+import { useSelector, useDispatch } from 'react-redux';
+import { setOpenAddressPanel, setAddressMode, setAddressId } from '../../store/slices/uiSlice';
 
 const ITEM_HEIGHT = 48;
 
@@ -11,7 +12,8 @@ const AddressBox = (props) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
 
-    const context = useContext(MyContext);
+    const dispatch = useDispatch();
+    const { userData } = useSelector((state) => state.auth);
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -27,9 +29,9 @@ const AddressBox = (props) => {
 
     const editAddress=(id)=>{
         setAnchorEl(null);
-        context?.setOpenAddressPanel(true);
-        context?.setAddressMode("edit");
-        context?.setAddressId(id);
+        dispatch(setOpenAddressPanel(true));
+        dispatch(setAddressMode("edit"));
+        dispatch(setAddressId(id));
     }
 
     return (
@@ -38,7 +40,7 @@ const AddressBox = (props) => {
             <span className="inline-block p-1 bg-[#e7e7e7] text-[12px] rounded-sm">{props?.address?.addressType}</span>
 
             <h4 className="pt-2 flex items-center gap-4 text-[14px]">
-                <span>{context?.userData?.name} </span>
+                <span>{userData?.name} </span>
                 <span>+{props?.address?.mobile}</span>
             </h4>
 

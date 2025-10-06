@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@mui/material";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { FaRegUser } from "react-icons/fa";
@@ -6,10 +6,15 @@ import { IoBagCheckOutline } from "react-icons/io5";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { IoIosLogOut } from "react-icons/io";
 import { NavLink } from "react-router";
-import { MyContext } from "../../App";
+import { useSelector, useDispatch } from "react-redux";
 import CircularProgress from '@mui/material/CircularProgress';
 import { fetchDataFromApi, uploadImage } from "../../utils/api";
 import { LuMapPin } from "react-icons/lu";
+import { setUserData, logout as logoutUser } from "../../store/slices/authSlice";
+import { clearCart } from "../../store/slices/cartSlice";
+import { clearMyList } from "../../store/slices/wishlistSlice";
+import { alertBox } from "../../utils/alertBox";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -18,16 +23,18 @@ const AccountSidebar = () => {
   const [previews, setPreviews] = useState([]);
   const [uploading, setUploading] = useState(false);
 
-  const context = useContext(MyContext);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { userData } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const userAvtar = [];
-    if (context?.userData?.avatar !== "" && context?.userData?.avatar !== undefined) {
-      userAvtar.push(context?.userData?.avatar);
+    if (userData?.avatar !== "" && userData?.avatar !== undefined) {
+      userAvtar.push(userData?.avatar);
       setPreviews(userAvtar)
     }
 
-  }, [context?.userData])
+  }, [userData])
 
   let selectedImages = [];
 
@@ -53,7 +60,7 @@ const AccountSidebar = () => {
 
 
         } else {
-          context.alertBox("error", "Please select a valid JPG , PNG or webp image file.");
+          alertBox("error", "Please select a valid JPG , PNG or webp image file.");
           setUploading(false);
           return false;
         }
@@ -64,9 +71,9 @@ const AccountSidebar = () => {
         let avatar = [];
         avatar.push(res?.data?.avtar);
         setPreviews(avatar);
-        context.alertBox("success", "Profile picture updated successfully!");
+        alertBox("success", "Profile picture updated successfully!");
         fetchDataFromApi(`/api/user/user-details`).then((res) => {
-          context?.setUserData(res.data);
+          dispatch(setUserData(res.data));
         })
 
       })
@@ -77,17 +84,17 @@ const AccountSidebar = () => {
   }
 
 
-   const logout = () => {
+   const handleLogout = () => {
 
       fetchDataFromApi(`/api/user/logout?token=${localStorage.getItem('accessToken')}`, { withCredentials: true }).then((res) => {
         if (res?.error === false) {
-          context.setIsLogin(false);
+          dispatch(logoutUser());
           localStorage.removeItem("accessToken");
           localStorage.removeItem("refreshToken");
-          context.setUserData(null);
-          context?.setCartData([]);
-          context?.setMyListData([]);
-          history("/");
+          dispatch(setUserData(null));
+          dispatch(clearCart());
+          dispatch(clearMyList());
+          navigate("/");
         }
   
   
@@ -138,8 +145,8 @@ const AccountSidebar = () => {
           </div>
         </div>
 
-        <h3>{context?.userData?.name}</h3>
-        <h6 className="text-[13px] font-[500]">{context?.userData?.email}</h6>
+        <h3>{userData?.name}</h3>
+        <h6 className="text-[13px] font-[500]">{userData?.email}</h6>
       </div>
 
       <ul className="list-none pb-5 bg-[#f1f1f1] myAccountTabs">
@@ -176,7 +183,7 @@ const AccountSidebar = () => {
         </li>
 
         <li className="w-full">
-          <Button className="w-full !py-2  !text-left !px-5 !justify-start !capitalize !text-[rgba(0,0,0,0.8)] !rounded-none flex items-center gap-2" onClick={logout}>
+          <Button className="w-full !py-2  !text-left !px-5 !justify-start !capitalize !text-[rgba(0,0,0,0.8)] !rounded-none flex items-center gap-2" onClick={handleLogout}>
             <IoIosLogOut className="text-[18px]" /> Logout
           </Button>
         </li>

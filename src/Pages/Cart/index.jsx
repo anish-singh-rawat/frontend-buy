@@ -1,18 +1,19 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import Button from "@mui/material/Button";
 import { BsFillBagCheckFill } from "react-icons/bs";
 import CartItems from "./cartItems";
-import { MyContext } from "../../App";
 import { fetchDataFromApi } from "../../utils/api";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const CartPage = () => {
 
   const [productSizeData, setProductSizeData] = useState([]);
   const [productRamsData, setProductRamsData] = useState([]);
   const [productWeightData, setProductWeightData] = useState([]);
-  const context = useContext(MyContext);
+  const { cartData } = useSelector((state) => state.cart);
+  const { userData } = useSelector((state) => state.auth);
 
   useEffect(() => {
 
@@ -64,14 +65,14 @@ const CartPage = () => {
             <div className="py-5 px-3 border-b border-[rgba(0,0,0,0.1)]">
               <h2>Your Cart</h2>
               <p className="mt-0 mb-0">
-                There are <span className="font-bold text-primary">{context?.cartData?.length}</span>{" "}
+                There are <span className="font-bold text-primary">{cartData?.length}</span>{" "}
                 products in your cart
               </p>
             </div>
 
             {
 
-              context?.cartData?.length !== 0 ? context?.cartData?.map((item, index) => {
+              cartData?.length !== 0 ? cartData?.map((item, index) => {
                 return (
                   <CartItems selected={() => selectedSize(item)} qty={item?.quantity} item={item} key={index} productSizeData={productSizeData} productRamsData={productRamsData} productWeightData={productWeightData} />
                 )
@@ -105,8 +106,8 @@ const CartPage = () => {
               <span className="text-[14px] font-[500]">Subtotal</span>
               <span className="text-primary font-bold">
                 {
-                  (context.cartData?.length !== 0 ?
-                    context.cartData?.map(item => parseInt(item.price) * item.quantity)
+                  (cartData?.length !== 0 ?
+                    cartData?.map(item => parseInt(item.price) * item.quantity)
                       .reduce((total, value) => total + value, 0) : 0)
                     ?.toLocaleString('en-US', { style: 'currency', currency: 'INR' })
                 }
@@ -120,15 +121,15 @@ const CartPage = () => {
 
             <p className="flex items-center justify-between">
               <span className="text-[14px] font-[500]">Estimate for</span>
-              <span className="font-bold"><span className="font-bold">{context?.userData?.address_details[0]?.country}</span></span>
+              <span className="font-bold"><span className="font-bold">{userData?.address_details?.[0]?.country}</span></span>
             </p>
 
             <p className="flex items-center justify-between">
               <span className="text-[14px] font-[500]">Total</span>
               <span className="text-primary font-bold">
                 {
-                  (context.cartData?.length !== 0 ?
-                    context.cartData?.map(item => parseInt(item.price) * item.quantity)
+                  (cartData?.length !== 0 ?
+                    cartData?.map(item => parseInt(item.price) * item.quantity)
                       .reduce((total, value) => total + value, 0) : 0)
                     ?.toLocaleString('en-US', { style: 'currency', currency: 'INR' })
                 }

@@ -1,5 +1,5 @@
 import Button from "@mui/material/Button";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { RiMenu2Fill } from "react-icons/ri";
 import { LiaAngleDownSolid } from "react-icons/lia";
 import { Link } from "react-router-dom";
@@ -7,19 +7,14 @@ import { GoRocket } from "react-icons/go";
 import CategoryPanel from "./CategoryPanel";
 
 import "../Navigation/style.css";
-import { fetchDataFromApi } from "../../../utils/api";
-import { MyContext } from "../../../App";
+import { useSelector } from "react-redux";
 import MobileNav from "./MobileNav";
 
 const Navigation = (props) => {
   const [isOpenCatPanel, setIsOpenCatPanel] = useState(false);
-  const [catData, setCatDatas] = useState([]);
-
-  const context = useContext(MyContext);
-
-  useEffect(() => {
-    setCatDatas(context?.catData);
-  }, [context?.catData]);
+  
+  const { catData } = useSelector((state) => state.category);
+  const { windowWidth } = useSelector((state) => state.ui);
 
   useEffect(() => {
     setIsOpenCatPanel(props.isOpenCatPanel);
@@ -34,7 +29,7 @@ const Navigation = (props) => {
       <nav className="navigation">
         <div className="container flex items-center justify-start lg:justify-end gap-8">
           {
-            context?.windowWidth > 992 &&
+            windowWidth > 992 &&
             <div className="col_1 w-[20%]">
               <Button
                 className="!text-black gap-2 w-full"
@@ -149,7 +144,7 @@ const Navigation = (props) => {
 
 
       {
-        context?.windowWidth < 992 && <MobileNav />
+        windowWidth < 992 && <MobileNav />
       }
 
 

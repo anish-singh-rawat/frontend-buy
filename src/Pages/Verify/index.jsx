@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import OtpBox from "../../components/OtpBox";
 import Button from "@mui/material/Button";
 import { postData } from "../../utils/api";
 import { useNavigate } from "react-router-dom";
-import { MyContext } from "../../App";
+import { alertBox } from "../../utils/alertBox";
 
 const Verify = () => {
   const [otp, setOtp] = useState("");
@@ -12,7 +12,6 @@ const Verify = () => {
   };
 
   const history = useNavigate();
-  const context = useContext(MyContext)
 
   const verityOTP = (e) => {
     e.preventDefault();
@@ -26,11 +25,11 @@ const Verify = () => {
         otp: otp
       }).then((res) => {
         if (res?.error === false) {
-          context.alertBox("success", res?.message);
+          alertBox("success", res?.message);
           localStorage.removeItem("userEmail")
           history("/login")
         } else {
-          context.alertBox("error", res?.message);
+          alertBox("error", res?.message);
         }
       })
     }
@@ -41,10 +40,10 @@ const Verify = () => {
         otp: otp
       }).then((res) => {
         if (res?.error === false) {
-          context.alertBox("success", res?.message);
+          alertBox("success", res?.message);
           history("/forgot-password")
         } else {
-          context.alertBox("error", res?.message);
+          alertBox("error", res?.message);
         }
       })
     }

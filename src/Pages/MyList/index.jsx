@@ -1,14 +1,14 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import MyListItems from "./myListItems";
 import AccountSidebar from "../../components/AccountSidebar";
-import { MyContext } from "../../App";
 import Button from "@mui/material/Button";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const MyList = () => {
 
-  const context = useContext(MyContext);
+  const { myListData } = useSelector((state) => state.wishlist);
 
   useEffect(()=>{
     window.scrollTo(0,0);
@@ -26,14 +26,14 @@ const MyList = () => {
             <div className="py-5 px-3 border-b border-[rgba(0,0,0,0.1)]">
               <h2>My List</h2>
               <p className="mt-0 mb-0">
-                There are <span className="font-bold text-primary">{context?.myListData?.length}</span>{" "}
+                There are <span className="font-bold text-primary">{myListData?.length}</span>{" "}
                 products in your My List
               </p>
             </div>
 
 
             {
-              context?.myListData?.length !== 0 ? context?.myListData?.map((item, index) => {
+              myListData?.length !== 0 ? myListData?.map((item, index) => {
                 return (
                   <MyListItems item={item} />
                 )

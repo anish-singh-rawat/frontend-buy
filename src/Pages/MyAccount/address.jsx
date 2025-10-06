@@ -1,13 +1,14 @@
 import React from 'react'
 import AccountSidebar from '../../components/AccountSidebar';
-import { useContext } from 'react';
-import { MyContext } from '../../App';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { useState } from 'react';
 
 import { useEffect } from 'react';
 import { deleteData, fetchDataFromApi } from '../../utils/api';
 import AddressBox from './addressBox';
+import { getUserDetails } from '../../store/thunks';
+import { setOpenAddressPanel, setAddressMode } from '../../store/slices/uiSlice';
 
 
 const label = { inputProps: { 'aria-label': 'Radio demo' } };
@@ -16,23 +17,24 @@ const Address = () => {
 
     const [address, setAddress] = useState([]);
 
-    const context = useContext(MyContext);
+    const dispatch = useDispatch();
+    const { userData } = useSelector((state) => state.auth);
 
     useEffect(() => {
-        if (context?.userData?._id !== "" && context?.userData?._id !== undefined) {
+        if (userData?._id !== "" && userData?._id !== undefined) {
 
-            setAddress(context?.userData?.address_details);
+            setAddress(userData?.address_details);
 
         }
 
-    }, [context?.userData])
+    }, [userData])
 
 
     const removeAddress = (id) => {
         deleteData(`/api/address/${id}`).then((res) => {
-            fetchDataFromApi(`/api/address/get?userId=${context?.userData?._id}`).then((res) => {
+            fetchDataFromApi(`/api/address/get?userId=${userData?._id}`).then((res) => {
                 setAddress(res.data);
-                context?.getUserDetails();
+                dispatch(getUserDetails());
 
             })
         })
@@ -58,8 +60,8 @@ const Address = () => {
 
                             <div className='flex items-center justify-center p-5 rounded-md border border-dashed border-[rgba(0,0,0,0.2)] bg-[#f1faff] hover:bg-[#e7f3f9] cursor-pointer'
                                 onClick={() => {
-                                    context?.setOpenAddressPanel(true);
-                                    context?.setAddressMode("add");
+                                    dispatch(setOpenAddressPanel(true));
+                                    dispatch(setAddressMode("add"));
                                 }}
                             >
                                 <span className='text-[14px] font-[500]'>Add Address</span>

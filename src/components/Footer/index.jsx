@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import { LiaShippingFastSolid } from "react-icons/lia";
 import { PiKeyReturnLight } from "react-icons/pi";
 import { BsWallet2 } from "react-icons/bs";
@@ -6,6 +6,7 @@ import { LiaGiftSolid } from "react-icons/lia";
 import { BiSupport } from "react-icons/bi";
 import { Link } from "react-router-dom";
 import { IoChatboxOutline } from "react-icons/io5";
+import { useSelector, useDispatch } from "react-redux";
 
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
@@ -16,8 +17,6 @@ import { FaInstagram } from "react-icons/fa";
 
 import Drawer from "@mui/material/Drawer";
 import CartPanel from "../CartPanel";
-import { MyContext } from "../../App";
-
 
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -26,10 +25,13 @@ import { ProductZoom } from "../ProductZoom";
 import { IoCloseSharp } from "react-icons/io5";
 import { ProductDetailsComponent } from "../ProductDetails";
 import AddAddress from "../../Pages/MyAccount/addAddress";
+import { toggleCartPanel, toggleAddressPanel, handleCloseProductDetailsModal } from "../../store/slices/uiSlice";
 
 
 const Footer = () => {
-  const context = useContext(MyContext);
+  const dispatch = useDispatch();
+  const { openCartPanel, openAddressPanel, addressMode, openProductDetailsModal } = useSelector((state) => state.ui);
+  const { cartData } = useSelector((state) => state.cart);
 
   return (
     <>
@@ -273,25 +275,25 @@ const Footer = () => {
 
       {/* Cart Panel */}
       <Drawer
-        open={context.openCartPanel}
-        onClose={context.toggleCartPanel(false)}
+        open={openCartPanel}
+        onClose={() => dispatch(toggleCartPanel(false))}
         anchor={"right"}
         className="cartPanel"
       >
         <div className="flex items-center justify-between py-3 px-4 gap-3 border-b border-[rgba(0,0,0,0.1)] overflow-hidden">
-          <h4>Shopping Cart ({context?.cartData?.length})</h4>
-          <IoCloseSharp className="text-[20px] cursor-pointer" onClick={context.toggleCartPanel(false)} />
+          <h4>Shopping Cart ({cartData?.length})</h4>
+          <IoCloseSharp className="text-[20px] cursor-pointer" onClick={() => dispatch(toggleCartPanel(false))} />
         </div>
 
 
         {
 
-          context?.cartData?.length !== 0 ? <CartPanel data={context?.cartData} /> :
+          cartData?.length !== 0 ? <CartPanel data={cartData} /> :
             <>
               <div className="flex items-center justify-center flex-col pt-[100px] gap-5">
                 <img src="/empty-cart.png" className="w-[150px]" />
                 <h4>Your Cart is currently empty</h4>
-                <Button className="btn-org btn-sm" onClick={context.toggleCartPanel(false)}>Continue Shopping</Button>
+                <Button className="btn-org btn-sm" onClick={() => dispatch(toggleCartPanel(false))}>Continue Shopping</Button>
               </div>
             </>
 
@@ -311,14 +313,14 @@ const Footer = () => {
 
       {/* Address Panel */}
       <Drawer
-        open={context.openAddressPanel}
-        onClose={context.toggleAddressPanel(false)}
+        open={openAddressPanel}
+        onClose={() => dispatch(toggleAddressPanel(false))}
         anchor={"right"}
         className="addressPanel"
       >
         <div className="flex items-center justify-between py-3 px-4 gap-3 border-b border-[rgba(0,0,0,0.1)] overflow-hidden">
-          <h4>{context?.addressMode === "add" ? 'Add' : 'Edit'} Delivery Address </h4>
-          <IoCloseSharp className="text-[20px] cursor-pointer" onClick={context.toggleAddressPanel(false)} />
+          <h4>{addressMode === "add" ? 'Add' : 'Edit'} Delivery Address </h4>
+          <IoCloseSharp className="text-[20px] cursor-pointer" onClick={() => dispatch(toggleAddressPanel(false))} />
         </div>
 
 
@@ -336,10 +338,10 @@ const Footer = () => {
 
 
       <Dialog
-        open={context?.openProductDetailsModal.open}
-        fullWidth={context?.fullWidth}
-        maxWidth={context?.maxWidth}
-        onClose={context?.handleCloseProductDetailsModal}
+        open={openProductDetailsModal.open}
+        fullWidth={true}
+        maxWidth="lg"
+        onClose={() => dispatch(handleCloseProductDetailsModal())}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         className="productDetailsModal"
@@ -348,19 +350,19 @@ const Footer = () => {
           <div className="flex items-center w-full productDetailsModalContainer relative">
             <Button
               className="!w-[40px] !h-[40px] !min-w-[40px] !rounded-full !text-[#000] !absolute top-[15px] right-[15px] !bg-[#f1f1f1]"
-              onClick={context?.handleCloseProductDetailsModal}
+              onClick={() => dispatch(handleCloseProductDetailsModal())}
             >
               <IoCloseSharp className="text-[20px]" />
             </Button>
             {
-              context?.openProductDetailsModal?.item?.length !== 0 &&
+              openProductDetailsModal?.item?.length !== 0 &&
               <>
                 <div className="col1 w-[40%] px-3 py-8">
-                  <ProductZoom images={context?.openProductDetailsModal?.item?.images} />
+                  <ProductZoom images={openProductDetailsModal?.item?.images} />
                 </div>
 
                 <div className="col2 w-[60%] py-8 px-8 pr-16 productContent ">
-                  <ProductDetailsComponent item={context?.openProductDetailsModal?.item} />
+                  <ProductDetailsComponent item={openProductDetailsModal?.item} />
                 </div>
               </>
             }

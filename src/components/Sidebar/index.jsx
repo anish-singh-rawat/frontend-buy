@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import "../Sidebar/style.css";
@@ -9,10 +9,11 @@ import { FaAngleUp } from "react-icons/fa6";
 import RangeSlider from "react-range-slider-input";
 import "react-range-slider-input/dist/style.css";
 import Rating from "@mui/material/Rating";
-import { MyContext } from "../../App";
 import { useLocation } from "react-router-dom";
 import { postData } from "../../utils/api";
 import { MdOutlineFilterAlt } from "react-icons/md";
+import { useSelector, useDispatch } from "react-redux";
+import { setSearchData, setOpenFilter } from "../../store/slices/uiSlice";
 
 
 export const Sidebar = (props) => {
@@ -33,14 +34,16 @@ export const Sidebar = (props) => {
 
   const [price, setPrice] = useState([0, 60000]);
 
-  const context = useContext(MyContext);
+  const dispatch = useDispatch();
+  const { catData } = useSelector((state) => state.category);
+  const { searchData } = useSelector((state) => state.ui);
 
   const location = useLocation();
 
 
   const handleCheckboxChange = (field, value) => {
 
-    context?.setSearchData([]);
+    dispatch(setSearchData([]));
 
     const currentValues = filters[field] || []
     const updatedValues = currentValues?.includes(value) ?
@@ -77,7 +80,7 @@ export const Sidebar = (props) => {
       filters.subCatId = [];
       filters.thirdsubCatId = [];
       filters.rating = [];
-      context?.setSearchData([]);
+      dispatch(setSearchData([]));
     }
 
     if (url.includes("subCatId")) {
@@ -88,7 +91,7 @@ export const Sidebar = (props) => {
       filters.catId = [];
       filters.thirdsubCatId = [];
       filters.rating = [];
-      context?.setSearchData([]);
+      dispatch(setSearchData([]));
     }
 
 
@@ -100,7 +103,7 @@ export const Sidebar = (props) => {
       filters.catId = [];
       filters.thirdsubCatId = thirdcatArr;
       filters.rating = [];
-      context?.setSearchData([]);
+      dispatch(setSearchData([]));
     }
 
     filters.page = 1;
@@ -119,12 +122,12 @@ export const Sidebar = (props) => {
   const filtesData = () => {
     props.setIsLoading(true);
 
-    //console.log(context?.searchData)
+    //console.log(searchData)
 
-    if (context?.searchData?.products?.length > 0) {
-      props.setProductsData(context?.searchData);
+    if (searchData?.products?.length > 0) {
+      props.setProductsData(searchData);
       props.setIsLoading(false);
-      props.setTotalPages(context?.searchData?.totalPages)
+      props.setTotalPages(searchData?.totalPages)
       window.scrollTo(0, 0);
     } else {
       postData(`/api/product/filters`, filters).then((res) => {
@@ -173,7 +176,7 @@ export const Sidebar = (props) => {
 
 
               {
-                context?.catData?.length !== 0 && context?.catData?.map((item, index) => {
+                catData?.length !== 0 && catData?.map((item, index) => {
                   return (
                     <FormControlLabel
                       key={index}
@@ -311,7 +314,7 @@ export const Sidebar = (props) => {
 
       </div>
       <br />
-      <Button className="btn-org w-full !flex lg:!hidden" onClick={() => context?.setOpenFilter(false)}><MdOutlineFilterAlt size={20} /> Filers</Button>
+      <Button className="btn-org w-full !flex lg:!hidden" onClick={() => dispatch(setOpenFilter(false))}><MdOutlineFilterAlt size={20} /> Filers</Button>
 
 
     </aside>

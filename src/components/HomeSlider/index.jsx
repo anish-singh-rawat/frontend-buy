@@ -1,14 +1,14 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 
 import { Navigation, Autoplay } from "swiper/modules";
-import { MyContext } from "../../App";
+import { useSelector } from "react-redux";
 
 const HomeSlider = (props) => {
 
-  const context  = useContext(MyContext);
+  const { windowWidth } = useSelector((state) => state.ui);
 
   return (
     <div className="homeSlider pb-3 pt-3 lg:pb-5 lg:pt-5 relative z-[99]">
@@ -16,7 +16,7 @@ const HomeSlider = (props) => {
         <Swiper
           loop={true}
           spaceBetween={10}
-          navigation={context?.windowWidth < 992 ? false : true}
+          navigation={windowWidth < 992 ? false : true}
           modules={[Navigation, Autoplay]}
           autoplay={{
             delay: 2500,

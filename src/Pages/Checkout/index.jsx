@@ -1,13 +1,15 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@mui/material";
 import { BsFillBagCheckFill } from "react-icons/bs";
-import { MyContext } from '../../App';
 import { FaPlus } from "react-icons/fa6";
 import Radio from '@mui/material/Radio';
 import { deleteData, fetchDataFromApi, postData } from "../../utils/api";
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import CircularProgress from '@mui/material/CircularProgress';
+import { useSelector, useDispatch } from "react-redux";
+import { getCartItems, alertBox } from "../../store/thunks";
+import { setOpenAddressPanel, setAddressMode, setAddressId } from "../../store/slices/uiSlice";
 
 const VITE_APP_RAZORPAY_KEY_ID = import.meta.env.VITE_APP_RAZORPAY_KEY_ID;
 const VITE_APP_RAZORPAY_KEY_SECRET = import.meta.env.VITE_APP_RAZORPAY_KEY_SECRET;
@@ -22,32 +24,36 @@ const Checkout = () => {
   const [selectedAddress, setSelectedAddress] = useState("");
   const [totalAmount, setTotalAmount] = useState();
   const [isLoading, setIsloading] = useState(false);
-  const context = useContext(MyContext);
+
+  const dispatch = useDispatch();
+  const { userData: reduxUserData } = useSelector((state) => state.auth);
+  const { cartData } = useSelector((state) => state.cart);
+  const { windowWidth } = useSelector((state) => state.ui);
 
   const history = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    setUserData(context?.userData)
-    setSelectedAddress(context?.userData?.address_details[0]?._id);
+    setUserData(reduxUserData)
+    setSelectedAddress(reduxUserData?.address_details[0]?._id);
 
-  }, [context?.userData, userData])
+  }, [reduxUserData, userData])
 
 
   useEffect(() => {
     setTotalAmount(
-      context.cartData?.length !== 0 ?
-        context.cartData?.map(item => parseInt(item.price) * item.quantity)
+      cartData?.length !== 0 ?
+        cartData?.map(item => parseInt(item.price) * item.quantity)
           .reduce((total, value) => total + value, 0) : 0)
       ?.toLocaleString('en-US', { style: 'currency', currency: 'INR' }
       );
 
-    // localStorage.setItem("totalAmount", context.cartData?.length !== 0 ?
-    //   context.cartData?.map(item => parseInt(item.price) * item.quantity)
+    // localStorage.setItem("totalAmount", cartData?.length !== 0 ?
+    //   cartData?.map(item => parseInt(item.price) * item.quantity)
     //     .reduce((total, value) => total + value, 0) : 0)
     //   ?.toLocaleString('en-US', { style: 'currency', currency: 'INR' })
 
-  }, [context.cartData])
+  }, [cartData])
 
 
 
@@ -85,7 +91,7 @@ const Checkout = () => {
               }
 
               const data = {
-                userId: context?.userData?._id,
+                userId: reduxUserData?._id,
                 totalAmount: convertedAmount
               }
 
@@ -108,17 +114,17 @@ const Checkout = () => {
         .render("#paypal-button-container");
     };
     document.body.appendChild(script);
-  }, [context?.cartData, context?.userData, selectedAddress]);
+  }, [cartData, reduxUserData, selectedAddress]);
 
 
 
 
   const onApprovePayment = async (data) => {
-    const user = context?.userData;
+    const user = reduxUserData;
 
     const info = {
       userId: user?._id,
-      products: context?.cartData,
+      products: cartData,
       payment_status: "COMPLETE",
       delivery_address: selectedAddress,
       totalAmount: totalAmount,
@@ -144,25 +150,25 @@ const Checkout = () => {
         paymentId: data.orderID
       }, { headers }
     ).then((res) => {
-      context.alertBox("success", res?.data?.message);
+      alertBox("success", res?.data?.message);
       history("/order/success");
-      deleteData(`/api/cart/emptyCart/${context?.userData?._id}`).then((res) => {
-        context?.getCartItems();
+      deleteData(`/api/cart/emptyCart/${reduxUserData?._id}`).then((res) => {
+        dispatch(getCartItems());
       })
     });
 
 
     if (response.data.success) {
-      context.alertBox("success", "Order completed and saved to database!");
+      alertBox("success", "Order completed and saved to database!");
     }
 
   }
 
 
   const editAddress = (id) => {
-    context?.setOpenAddressPanel(true);
-    context?.setAddressMode("edit");
-    context?.setAddressId(id);
+    dispatch(setOpenAddressPanel(true));
+    dispatch(setAddressMode("edit"));
+    dispatch(setAddressId(id));
   }
 
 
@@ -184,18 +190,18 @@ const Checkout = () => {
         key_secret: VITE_APP_RAZORPAY_KEY_SECRET,
         amount: parseInt(totalAmount * 100),
         currency: "INR",
-        order_receipt: context?.userData?.name,
+        order_receipt: reduxUserData?.name,
         name: "Advanced UI Techniques",
         description: "for testing purpose",
         handler: function (response) {
 
           const paymentId = response.razorpay_payment_id;
 
-          const user = context?.userData
+          const user = reduxUserData
 
           const payLoad = {
             userId: user?._id,
-            products: context?.cartData,
+            products: cartData,
             paymentId: paymentId,
             payment_status: "COMPLETED",
             delivery_address: selectedAddress,
@@ -209,15 +215,15 @@ const Checkout = () => {
 
 
           postData(`/api/order/create`, payLoad).then((res) => {
-            context.alertBox("success", res?.message);
+            alertBox("success", res?.message);
             if (res?.error === false) {
               deleteData(`/api/cart/emptyCart/${user?._id}`).then((res) => {
-                context?.getCartItems();
+                dispatch(getCartItems());
               })
               history("/order/success");
             } else {
               history("/order/failed");
-              context.alertBox("error", res?.message);
+              alertBox("error", res?.message);
             }
           });
 
@@ -233,7 +239,7 @@ const Checkout = () => {
       pay.open();
     }
     else {
-      context.alertBox("error", "Please add address");
+      alertBox("error", "Please add address");
     }
 
   }
@@ -242,13 +248,13 @@ const Checkout = () => {
 
   const cashOnDelivery = () => {
 
-    const user = context?.userData
+    const user = reduxUserData
     setIsloading(true);
 
     if (userData?.address_details?.length !== 0) {
       const payLoad = {
         userId: user?._id,
-        products: context?.cartData,
+        products: cartData,
         paymentId: '',
         payment_status: "CASH ON DELIVERY",
         delivery_address: selectedAddress,
@@ -262,20 +268,20 @@ const Checkout = () => {
 
 
       postData(`/api/order/create`, payLoad).then((res) => {
-        context.alertBox("success", res?.message);
+        alertBox("success", res?.message);
 
         if (res?.error === false) {
           deleteData(`/api/cart/emptyCart/${user?._id}`).then((res) => {
-            context?.getCartItems();
+            dispatch(getCartItems());
             setIsloading(false);
           })
         } else {
-          context.alertBox("error", res?.message);
+          alertBox("error", res?.message);
         }
         history("/order/success");
       });
     } else {
-      context.alertBox("error", "Please add address");
+      alertBox("error", "Please add address");
       setIsloading(false);
     }
 
@@ -295,11 +301,11 @@ const Checkout = () => {
                   userData?.address_details?.length !== 0 &&
                   <Button variant="outlined"
                     onClick={() => {
-                      context?.setOpenAddressPanel(true);
-                      context?.setAddressMode("add");
+                      dispatch(setOpenAddressPanel(true));
+                      dispatch(setAddressMode("add"));
                     }} className="btn">
                     <FaPlus />
-                    ADD {context?.windowWidth< 767 ? '' : 'NEW ADDRESS'}
+                    ADD {windowWidth< 767 ? '' : 'NEW ADDRESS'}
                   </Button>
                 }
 
@@ -348,8 +354,8 @@ const Checkout = () => {
                         <p className="mt-0">Add a delivery address.</p>
                         <Button className="btn-org" 
                         onClick={() => {
-                          context?.setOpenAddressPanel(true);
-                          context?.setAddressMode("add");
+                          dispatch(setOpenAddressPanel(true));
+                          dispatch(setAddressMode("add"));
                         }}>ADD ADDRESS</Button>
                       </div>
                     </>
@@ -374,7 +380,7 @@ const Checkout = () => {
               <div className="mb-5 scroll max-h-[250px] overflow-y-scroll overflow-x-hidden pr-2">
 
                 {
-                  context?.cartData?.length !== 0 && context?.cartData?.map((item, index) => {
+                  cartData?.length !== 0 && cartData?.map((item, index) => {
                     return (
                       <div className="flex items-center justify-between py-2" key={index}>
                         <div className="part1 flex items-center gap-3">

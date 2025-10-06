@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import HomeSlider from "../../components/HomeSlider";
 import HomeCatSlider from "../../components/HomeCatSlider";
 import { LiaShippingFastSolid } from "react-icons/lia";
@@ -18,7 +18,7 @@ import BlogItem from "../../components/BlogItem";
 import HomeBannerV2 from "../../components/HomeSliderV2";
 import BannerBoxV2 from "../../components/bannerBoxV2";
 import { fetchDataFromApi } from "../../utils/api";
-import { MyContext } from "../../App";
+import { useSelector } from "react-redux";
 import ProductLoading from "../../components/ProductLoading";
 
 const Home = () => {
@@ -32,9 +32,7 @@ const Home = () => {
   const [blogData, setBlogData] = useState([]);
   const [randomCatProducts, setRandomCatProducts] = useState([]);
 
-
-  const context = useContext(MyContext);
-
+  const { catData } = useSelector((state) => state.category);
 
   useEffect(() => {
 
@@ -67,9 +65,9 @@ const Home = () => {
 
 
   useEffect(() => {
-    if (context?.catData?.length !== 0) {
+    if (catData?.length !== 0) {
 
-      fetchDataFromApi(`/api/product/getAllProductsByCatId/${context?.catData[0]?._id}`).then((res) => {
+      fetchDataFromApi(`/api/product/getAllProductsByCatId/${catData[0]?._id}`).then((res) => {
         if (res?.error === false) {
           setPopularProductsData(res?.products)
         }
@@ -78,7 +76,7 @@ const Home = () => {
     }
 
     const numbers = new Set();
-    while (numbers.size < context?.catData?.length - 1) {
+    while (numbers.size < catData?.length - 1) {
 
       const number = Math.floor(1 + Math.random() * 9);
 
@@ -87,9 +85,9 @@ const Home = () => {
     }
 
 
-    getRendomProducts(Array.from(numbers), context?.catData)
+    getRendomProducts(Array.from(numbers), catData)
 
-  }, [context?.catData])
+  }, [catData])
 
 
 
@@ -140,7 +138,7 @@ const Home = () => {
 
 
       {
-        context?.catData?.length !== 0 && <HomeCatSlider data={context?.catData} />
+        catData?.length !== 0 && <HomeCatSlider data={catData} />
       }
 
 
@@ -164,7 +162,7 @@ const Home = () => {
                 aria-label="scrollable auto tabs example"
               >
                 {
-                  context?.catData?.length !== 0 && context?.catData?.map((cat, index) => {
+                  catData?.length !== 0 && catData?.map((cat, index) => {
                     return (
                       <Tab label={cat?.name} key={index} onClick={() => filterByCatId(cat?._id)} />
                     )

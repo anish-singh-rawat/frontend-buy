@@ -1,24 +1,24 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import 'swiper/css/free-mode';
+import { useSelector } from "react-redux";
 
 import { Navigation, FreeMode } from "swiper/modules";
 import BannerBox from "../BannerBox";
 import BannerBoxV2 from "../bannerBoxV2";
-import { MyContext } from "../../App";
 
 const AdsBannerSlider = (props) => {
 
-  const context = useContext(MyContext);
+  const { windowWidth } = useSelector((state) => state.ui);
 
   return (
     <div className="py-2 lg:py-5 w-full resBannersSlider">
       <Swiper
         slidesPerView={props.items}
         spaceBetween={10}
-        navigation={context?.windowWidth < 992 ? false : true}
+        navigation={windowWidth < 992 ? false : true}
         modules={[Navigation, FreeMode]}
         freeMode={true}
         breakpoints={{
