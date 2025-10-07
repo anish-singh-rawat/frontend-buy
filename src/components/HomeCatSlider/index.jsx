@@ -45,7 +45,7 @@ const HomeCatSlider = (props) => {
             props?.data?.map((cat, index) => {
               return (
                 <SwiperSlide>
-                  <Link to="/">
+                  <Link to={`products?catId=${cat?._id}`}>
                     <div className="item py-4 lg:py-7 px-3 bg-white rounded-sm text-center flex items-center justify-center flex-col">
                       <img
                         src={`https://serviceapi.spicezgold.com/download/${cat?.images[0]}`}
@@ -58,8 +58,6 @@ const HomeCatSlider = (props) => {
               )
             })
           }
-
-
         </Swiper>
       </div>
     </div>

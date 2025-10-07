@@ -40,7 +40,7 @@ export const ProductZoom = (props) => {
                   <SwiperSlide key={index}>
                     <div className={`item rounded-md overflow-hidden cursor-pointer group h-[100%] ${slideIndex === index ? 'opacity-1' : 'opacity-30'}`} onClick={() => goto(index)}>
                       <img
-                        src={item}
+                        src={`https://serviceapi.spicezgold.com/download/${item}`}
                       />
                     </div>
                   </SwiperSlide>
@@ -65,7 +65,7 @@ export const ProductZoom = (props) => {
                     <InnerImageZoom
                       zoomType="hover"
                       zoomScale={1}
-                      src={item}
+                      src={`https://serviceapi.spicezgold.com/download/${item}`}
                     />
                   </SwiperSlide>
                 )
