@@ -56,24 +56,24 @@ const Header = () => {
 
   const location = useLocation();
 
-  useEffect(() => {
+  // useEffect(() => {
 
-    fetchDataFromApi("/api/logo").then((res) => {
-      localStorage.setItem('logo', res?.logo[0]?.logo)
-    })
+  //   fetchDataFromApi("/api/logo").then((res) => {
+  //     localStorage.setItem('logo', res?.logo[0]?.logo)
+  //   })
 
-    setTimeout(() => {
-      const token = localStorage.getItem('accessToken');
+  //   setTimeout(() => {
+  //     const token = localStorage.getItem('accessToken');
 
-      if (token !== undefined && token !== null && token !== "") {
-        const url = window.location.href
-        history(location.pathname)
-      } else {
-        history("/login")
-      }
-    }, [1000])
+  //     if (token !== undefined && token !== null && token !== "") {
+  //       const url = window.location.href
+  //       history(location.pathname)
+  //     } else {
+  //       history("/login")
+  //     }
+  //   }, [1000])
 
-  }, [isLogin]);
+  // }, [isLogin]);
 
   const handleLogout = () => {
     setAnchorEl(null);
