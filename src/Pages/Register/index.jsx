@@ -81,7 +81,7 @@ const Register = () => {
           password: ""
         })
 
-        history("/verify")
+        history("/verify-email")
       } else {
         alertBox("error", res?.message);
         setIsLoading(false);

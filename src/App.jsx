@@ -82,7 +82,7 @@ const AppContent = () => {
           <Route path={"/login"} exact={true} element={<Login />} />
           <Route path={"/register"} exact={true} element={<Register />} />
           <Route path={"/cart"} exact={true} element={<CartPage />} />
-          <Route path={"/verify"} exact={true} element={<Verify />} />
+          <Route path={"/verify-email"} exact={true} element={<Verify />} />
           <Route path={"/forgot-password"} exact={true} element={<ForgotPassword />} />
           <Route path={"/checkout"} exact={true} element={<Checkout />} />
           <Route path={"/my-account"} exact={true} element={<MyAccount />} />

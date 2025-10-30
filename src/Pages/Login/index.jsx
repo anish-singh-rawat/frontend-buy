@@ -54,7 +54,7 @@ const Login = () => {
             }).then((res) => {
               if (res?.error === false) {
                 alertBox("success", res?.message);
-                history("/verify")
+                history("/verify-email")
               } else {
                 alertBox("error", res?.message);
               }
