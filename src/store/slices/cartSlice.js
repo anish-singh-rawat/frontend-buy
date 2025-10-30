@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { getCartItems, addToCart } from '../thunks';
 
 const initialState = {
-  cartData: [],
+  cartData: typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('guestCart') || '[]') : [],
   loading: false,
   error: null,
 };

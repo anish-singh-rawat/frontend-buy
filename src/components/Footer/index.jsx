@@ -108,32 +108,32 @@ const Footer = () => {
 
                 <ul className="list">
                   <li className="list-none text-[14px] w-full mb-2">
-                    <Link to="/" className="link">
+                    <Link to="/prices-drop" className="link">
                       Prices drop
                     </Link>
                   </li>
                   <li className="list-none text-[14px] w-full mb-2">
-                    <Link to="/" className="link">
+                    <Link to="/new-products" className="link">
                       New products
                     </Link>
                   </li>
                   <li className="list-none text-[14px] w-full mb-2">
-                    <Link to="/" className="link">
+                    <Link to="/best-sales" className="link">
                       Best sales
                     </Link>
                   </li>
                   <li className="list-none text-[14px] w-full mb-2">
-                    <Link to="/" className="link">
+                    <Link to="/contact" className="link">
                       Contact us
                     </Link>
                   </li>
                   <li className="list-none text-[14px] w-full mb-2">
-                    <Link to="/" className="link">
+                    <Link to="/sitemap" className="link">
                       Sitemap
                     </Link>
                   </li>
                   <li className="list-none text-[14px] w-full mb-2">
-                    <Link to="/" className="link">
+                    <Link to="/stores" className="link">
                       Stores
                     </Link>
                   </li>
@@ -145,32 +145,32 @@ const Footer = () => {
 
                 <ul className="list">
                   <li className="list-none text-[14px] w-full mb-2">
-                    <Link to="/" className="link">
+                    <Link to="/delivery" className="link">
                       Delivery
                     </Link>
                   </li>
                   <li className="list-none text-[14px] w-full mb-2">
-                    <Link to="/" className="link">
+                    <Link to="/legal-notice" className="link">
                       Legal Notice
                     </Link>
                   </li>
                   <li className="list-none text-[14px] w-full mb-2">
-                    <Link to="/" className="link">
+                    <Link to="/terms" className="link">
                       Terms and conditions of use
                     </Link>
                   </li>
                   <li className="list-none text-[14px] w-full mb-2">
-                    <Link to="/" className="link">
+                    <Link to="/about-us" className="link">
                       About us
                     </Link>
                   </li>
                   <li className="list-none text-[14px] w-full mb-2">
-                    <Link to="/" className="link">
+                    <Link to="/secure-payment" className="link">
                       Secure payment
                     </Link>
                   </li>
                   <li className="list-none text-[14px] w-full mb-2">
-                    <Link to="/" className="link">
+                    <Link to="/login" className="link">
                       Login
                     </Link>
                   </li>

@@ -24,6 +24,16 @@ import Address from "./Pages/MyAccount/address";
 import { OrderSuccess } from "./Pages/Orders/success";
 import { OrderFailed } from "./Pages/Orders/failed";
 import SearchPage from "./Pages/Search";
+import PricesDrop from "./Pages/PricesDrop";
+import NewProducts from "./Pages/NewProducts";
+import BestSales from "./Pages/BestSales";
+import Sitemap from "./Pages/Sitemap";
+import Stores from "./Pages/Stores";
+import Delivery from "./Pages/Delivery";
+import LegalNotice from "./Pages/LegalNotice";
+import Terms from "./Pages/Terms";
+import AboutUs from "./Pages/AboutUs";
+import SecurePayment from "./Pages/SecurePayment";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsLogin, setUserData } from "./store/slices/authSlice";
 import { setWindowWidth } from "./store/slices/uiSlice";
@@ -67,16 +77,8 @@ const AppContent = () => {
         <Header />
         <Routes>
           <Route path={"/"} exact={true} element={<Home />} />
-          <Route
-            path={"/products"}
-            exact={true}
-            element={<ProductListing />}
-          />
-          <Route
-            path={"/product/:id"}
-            exact={true}
-            element={<ProductDetails />}
-          />
+          <Route path={"/products"} exact={true} element={<ProductListing />} />
+          <Route path={"/product/:id"} exact={true} element={<ProductDetails />} />
           <Route path={"/login"} exact={true} element={<Login />} />
           <Route path={"/register"} exact={true} element={<Register />} />
           <Route path={"/cart"} exact={true} element={<CartPage />} />
@@ -90,6 +92,16 @@ const AppContent = () => {
           <Route path={"/order/failed"} exact={true} element={<OrderFailed />} />
           <Route path={"/address"} exact={true} element={<Address />} />
           <Route path={"/search"} exact={true} element={<SearchPage />} />
+          <Route path={"/prices-drop"} exact={true} element={<PricesDrop />} />
+          <Route path={"/new-products"} exact={true} element={<NewProducts />} />
+          <Route path={"/best-sales"} exact={true} element={<BestSales />} />
+          <Route path={"/sitemap"} exact={true} element={<Sitemap />} />
+          <Route path={"/stores"} exact={true} element={<Stores />} />
+          <Route path={"/delivery"} exact={true} element={<Delivery />} />
+          <Route path={"/legal-notice"} exact={true} element={<LegalNotice />} />
+          <Route path={"/terms"} exact={true} element={<Terms />} />
+          <Route path={"/about-us"} exact={true} element={<AboutUs />} />
+          <Route path={"/secure-payment"} exact={true} element={<SecurePayment />} />
         </Routes>
         <Footer />
       </BrowserRouter>
