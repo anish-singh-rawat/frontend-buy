@@ -81,7 +81,7 @@ const ProductListing = () => {
 
 
           <div className="rightContent w-full lg:w-[80%] py-3">
-            <div className="bg-[#f1f1f1] p-2 w-full mb-4 rounded-md flex items-center justify-between sticky top-[135px] z-[99]">
+            <div className="bg-[#f1f1f1] p-2 w-full mb-4 rounded-md flex items-center justify-between top-[135px] z-[99]">
               <div className="col1 flex items-center itemViewActions">
                 <Button
                   className={`!w-[35px] !h-[35px] !min-w-[35px] !rounded-full 
@@ -99,7 +99,7 @@ const ProductListing = () => {
                 </Button>
 
                 <span className="text-[14px] hidden sm:block md:block lg:block font-[500] pl-3 text-[rgba(0,0,0,0.7)]">
-                  There are {productsData?.products?.length !== 0 ? productsData?.products?.length : 0}  products.
+                  There are {productsData?.products?.length !== 0 ? productsData?.products?.length : 0}  products  adf.
                 </span>
               </div>
 

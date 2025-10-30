@@ -77,30 +77,30 @@ const Home = () => {
 
 
 
-  useEffect(() => {
-    if (catData?.length !== 0) {
+  // useEffect(() => {
+  //   if (catData?.length !== 0) {
 
-      fetchDataFromApi(`/api/product/getAllProductsByCatId/${catData[0]?._id}`).then((res) => {
-        if (res?.error === false) {
-          setPopularProductsData(res?.products)
-        }
+  //     fetchDataFromApi(`/api/product/getAllProductsByCatId/${catData[0]?._id}`).then((res) => {
+  //       if (res?.error === false) {
+  //         setPopularProductsData(res?.products)
+  //       }
 
-      })
-    }
+  //     })
+  //   }
 
-    const numbers = new Set();
-    while (numbers.size < catData?.length - 1) {
+  //   const numbers = new Set();
+  //   while (numbers.size < catData?.length - 1) {
 
-      const number = Math.floor(1 + Math.random() * 8);
+  //     const number = Math.floor(1 + Math.random() * 8);
 
-      // Add the number to the set (automatically ensures uniqueness)
-      numbers.add(number);
-    }
+  //     // Add the number to the set (automatically ensures uniqueness)
+  //     numbers.add(number);
+  //   }
 
 
-    getRendomProducts(Array.from(numbers), catData)
+  //   getRendomProducts(Array.from(numbers), catData)
 
-  }, [catData])
+  // }, [catData])
 
 
 
