@@ -11,10 +11,65 @@ import { useDispatch } from "react-redux";
 import { setIsLogin, setUserData } from "../../store/slices/authSlice";
 import { alertBox } from "../../store/thunks";
 
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { firebaseApp } from "../../firebase";
-const auth = getAuth(firebaseApp);
-const googleProvider = new GoogleAuthProvider();
+// We'll use Google Identity Services (client-side OAuth) instead of Firebase.
+// Make sure to add VITE_GOOGLE_CLIENT_ID to your .env with your Google OAuth client id.
+
+// Helper: load Google Identity Services script
+const loadGoogleScript = () => {
+  return new Promise((resolve) => {
+    if (window.google && window.google.accounts) return resolve();
+    const id = "google-client-script";
+    if (document.getElementById(id)) {
+      // if already adding, wait a bit
+      const check = setInterval(() => {
+        if (window.google && window.google.accounts) {
+          clearInterval(check);
+          resolve();
+        }
+      }, 100);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.id = id;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => resolve();
+    document.head.appendChild(script);
+  });
+};
+
+// Request profile using token client and the Google People API
+const requestGoogleProfile = async () => {
+  await loadGoogleScript();
+  const clientId = import.meta.env.VITE_API_GOOGLE_AUTH_CLIENT_ID;
+  if (!clientId) throw new Error("VITE_API_GOOGLE_AUTH_CLIENT_ID not set in .env");
+
+  return new Promise((resolve, reject) => {
+    const client = window.google.accounts.oauth2.initTokenClient({
+      client_id: clientId,
+      scope: "openid email profile",
+      callback: async (tokenResponse) => {
+        if (!tokenResponse || !tokenResponse.access_token) {
+          return reject(new Error("No access token received from Google"));
+        }
+        try {
+          const profileResp = await fetch(
+            "https://www.googleapis.com/oauth2/v3/userinfo",
+            { headers: { Authorization: `Bearer ${tokenResponse.access_token}` } }
+          );
+          const profile = await profileResp.json();
+          resolve({ tokenResponse, profile });
+        } catch (err) {
+          reject(err);
+        }
+      },
+    });
+
+    // show popup to request access token
+    client.requestAccessToken();
+  });
+};
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -126,55 +181,39 @@ const Login = () => {
 
       const authWithGoogle = () => {
     
-        signInWithPopup(auth, googleProvider)
-          .then((result) => {
-            // This gives you a Google Access Token. You can use it to access the Google API.
-            const credential = GoogleAuthProvider.credentialFromResult(result);
-            const token = credential.accessToken;
-            // The signed-in user info.
-            const user = result.user;
-    
+        // Use Google Identity Services to get profile (no Firebase)
+        requestGoogleProfile()
+          .then(({ profile }) => {
             const fields = {
-              name: user.providerData[0].displayName,
-              email: user.providerData[0].email,
+              name: profile.name || profile.given_name || "",
+              email: profile.email,
               password: null,
-              avatar: user.providerData[0].photoURL,
-              mobile: user.providerData[0].phoneNumber,
-              role: "USER"
+              avatar: profile.picture || null,
+              mobile: profile.phone_number || null,
+              role: "USER",
             };
-    
-    
+
             postData("/api/user/authWithGoogle", fields).then((res) => {
-    
               if (res?.error !== true) {
                 setIsLoading(false);
                 alertBox("success", res?.message);
-                localStorage.setItem("userEmail", fields.email)
+                localStorage.setItem("userEmail", fields.email);
                 localStorage.setItem("accessToken", res?.data?.accesstoken);
                 localStorage.setItem("refreshToken", res?.data?.refreshToken);
-    
+
                 dispatch(setIsLogin(true));
-    
-                history("/")
+
+                history("/");
               } else {
                 alertBox("error", res?.message);
                 setIsLoading(false);
               }
-    
-            })
-    
-            console.log(user)
-            // IdP data available using getAdditionalUserInfo(result)
-            // ...
-          }).catch((error) => {
-            // Handle Errors here.
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            // The email of the user's account used.
-            const email = error.customData.email;
-            // The AuthCredential type that was used.
-            const credential = GoogleAuthProvider.credentialFromError(error);
-            // ...
+            });
+          })
+          .catch((err) => {
+            console.error("Google auth error:", err);
+            alertBox("error", "Google authentication failed");
+            setIsLoading(false);
           });
     
     
